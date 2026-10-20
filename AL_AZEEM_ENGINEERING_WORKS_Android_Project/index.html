@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AL AZEEM ENGINEERING WORKS - Billing App</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f2f4f7;color:#20252b}
+header{background:#17202a;color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:23px}header small{opacity:.8}
+.container{max-width:1200px;margin:22px auto;padding:0 16px}
+.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:0 2px 10px #0001}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+label{font-weight:bold;font-size:13px;display:block;margin-bottom:6px}
+input,textarea,button{font:inherit}input,textarea{width:100%;padding:10px;border:1px solid #ccd2d8;border-radius:6px}textarea{min-height:75px;resize:vertical}
+table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #d8dde2;padding:9px;text-align:left}th{background:#eef1f4}
+td input{border:0;padding:5px}.amount{text-align:right;font-weight:bold}.right{text-align:right}
+button{border:0;border-radius:6px;padding:10px 15px;cursor:pointer;font-weight:bold;margin:4px 3px 0 0}
+.primary{background:#1f6feb;color:#fff}.success{background:#16834b;color:#fff}.whatsapp{background:#25d366;color:#fff}.danger{background:#c0392b;color:#fff}.secondary{background:#e7eaee;color:#222}
+.totalbox{margin-left:auto;max-width:360px}.totalrow{display:flex;justify-content:space-between;padding:6px 0}.grand{font-size:21px;font-weight:bold;border-top:2px solid #222;padding-top:10px}
+#historyTable td{vertical-align:middle}.muted{color:#68727d;font-size:13px}
+@media(max-width:800px){.grid,.grid2{grid-template-columns:1fr}table{font-size:12px;display:block;overflow-x:auto}}
+
+/* Mobile app layout */
+body{background:#f4f6f8;padding-bottom:20px}
+header{position:sticky;top:0;z-index:10;padding:14px 16px}
+header h1{font-size:18px;line-height:1.2}
+header small{font-size:11px}
+.container{margin:12px auto;padding:0 10px}
+.card{padding:14px;margin-bottom:12px;border-radius:12px}
+h2{font-size:18px;margin:4px 0 14px}
+.grid,.grid2{grid-template-columns:1fr;gap:10px}
+input,textarea,select{font-size:16px;min-height:44px}
+textarea{min-height:90px}
+button{min-height:46px;padding:10px 13px;font-size:15px}
+#itemsTable{font-size:13px}
+#itemsTable th,#itemsTable td{padding:6px}
+#itemsTable input{min-width:70px}
+.totalbox{max-width:none;margin-top:14px}
+.totalrow{font-size:15px}
+.grand{font-size:20px}
+.actions button{width:100%;margin:5px 0}
+@media(max-width:600px){
+  header{display:block}
+  header>div:last-child{margin-top:5px;font-size:12px}
+  .card{box-shadow:0 1px 7px #0001}
+  #itemsTable th:nth-child(1){min-width:145px}
+  #itemsTable th:nth-child(2){min-width:65px}
+  #itemsTable th:nth-child(3){min-width:85px}
+  #itemsTable th:nth-child(4){min-width:95px}
+}
+
+</style>
+</head>
+<body>
+<header><div><h1>AL AZEEM ENGINEERING WORKS</h1><small>Billing & Invoice System</small></div><div>Mobile Billing</div></header>
+
+<div class="container">
+<div class="card">
+<h2>Company & Customer</h2>
+<div class="grid2">
+<div><label>Company Address / Contact</label><textarea id="companyInfo">AL AZEEM ENGINEERING WORKS
+Phone: 03103363128
+Address: House No. 42, Old Taj Ghee Mil, Rohri Township, New Yard</textarea></div>
+<div><label>Customer Name</label><input id="customerName" placeholder="Customer name"><br><label style="margin-top:10px">Customer WhatsApp Number</label><input id="whatsapp" placeholder="e.g. 923001234567"></div>
+</div>
+<div class="grid" style="margin-top:14px">
+<div><label>Bill / Invoice No.</label><input id="invoiceNo" readonly></div>
+<div><label>Date</label><input id="billDate" type="date"></div>
+
+<div><label>Payment Status</label><select id="paymentStatus" style="width:100%;padding:10px;border:1px solid #ccd2d8;border-radius:6px"><option>Unpaid</option><option>Paid</option><option>Partially Paid</option></select></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Items / Services</h2>
+<table id="itemsTable">
+<thead><tr><th style="width:35%">Description</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead>
+<tbody></tbody>
+</table>
+<button class="secondary" onclick="addItem()">+ Add Item</button>
+<div class="totalbox">
+<div class="totalrow"><span>Subtotal</span><strong id="subtotal">Rs. 0.00</strong></div>
+<div class="totalrow"><span>Discount</span><input id="discount" type="number" min="0" value="0" style="width:130px;text-align:right" oninput="calculate()"></div>
+<div class="totalrow grand"><span>GRAND TOTAL</span><span id="grandTotal">Rs. 0.00</span></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Actions</h2>
+<button class="primary" onclick="saveBill()">💾 Save Bill PDF</button>
+<button class="whatsapp" onclick="sendWhatsApp()">📱 Send Bill on WhatsApp</button>
+<button class="secondary" onclick="printBill()">🖨️ Print</button>
+<button class="secondary" onclick="newBill()">➕ New Bill</button>
+<button class="danger" onclick="clearHistory()">Clear History</button>
+<p class="muted">Bills are stored in the app. Use Save Bill to create the bill file.</p>
+</div>
+
+<div class="card">
+<h2>Saved Bills</h2>
+<table id="historyTable"><thead><tr><th>Bill No.</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table>
+</div>
+</div>
+
+<script>
+let folderHandle=null;
+let bills=JSON.parse(localStorage.getItem("azeemBills")||"[]");
+
+function nextInvoice(){
+ const n=Number(localStorage.getItem("azeemInvoice")||0)+1;
+ localStorage.setItem("azeemInvoice",n);
+ return "AEW-"+String(n).padStart(5,"0");
+}
+function init(){
+ invoiceNo.value=nextInvoice();
+ billDate.value=new Date().toISOString().slice(0,10);
+ addItem();
+ renderHistory();
+}
+function addItem(desc="",qty=1,rate=0){
+ const tr=document.createElement("tr");
+ tr.innerHTML=`<td><input class="desc" value="${escapeHtml(desc)}" placeholder="Item / service"></td>
+ <td><input class="qty" type="number" min="0" value="${qty}" oninput="calculate()"></td>
+ <td><input class="rate" type="number" min="0" value="${rate}" oninput="calculate()"></td>
+ <td class="amount">Rs. 0.00</td><td><button class="danger" onclick="this.closest('tr').remove();calculate()">×</button></td>`;
+ document.querySelector("#itemsTable tbody").appendChild(tr); calculate();
+}
+function escapeHtml(s){return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;")}
+function money(n){return "Rs. "+Number(n).toLocaleString("en-PK",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function calculate(){
+ let sub=0;
+ document.querySelectorAll("#itemsTable tbody tr").forEach(r=>{
+  let q=Number(r.querySelector(".qty").value)||0, rate=Number(r.querySelector(".rate").value)||0;
+  let a=q*rate; sub+=a; r.querySelector(".amount").textContent=money(a);
+ });
+ let dis=Number(discount.value)||0, total=Math.max(0,sub-dis);
+ subtotal.textContent=money(sub);grandTotal.textContent=money(total);
+ return {sub,dis,total};
+}
+function getBill(){
+ let items=[];document.querySelectorAll("#itemsTable tbody tr").forEach(r=>{
+  let desc=r.querySelector(".desc").value.trim(),q=Number(r.querySelector(".qty").value)||0,rate=Number(r.querySelector(".rate").value)||0;
+  if(desc||q||rate) items.push({desc,q,rate,amount:q*rate});
+ });
+ let c=calculate();
+ return {invoice:invoiceNo.value,date:billDate.value,company:companyInfo.value,customer:customerName.value,phone:whatsapp.value,status:paymentStatus.value,items,...c};
+}
+
+function pdfHtml(b){
+ return `<html><head><meta charset="UTF-8"><style>
+ body{font-family:Arial;margin:40px;color:#111}h1{margin-bottom:3px} .top{display:flex;justify-content:space-between}.box{white-space:pre-line}.line{border-top:2px solid #111;margin:20px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #aaa;padding:9px}th{background:#eee}.r{text-align:right}.grand{font-size:18px;font-weight:bold}
+ </style></head><body><div class="top"><div><h1>AL AZEEM ENGINEERING WORKS</h1><div class="box">${escapeHtml(b.company)}</div></div>
+ <div><b>INVOICE</b><br>Bill No: ${b.invoice}<br>Date: ${b.date}<br>Status: ${b.status}</div></div>
+ <div class="line"></div><b>Customer Name</b><div class="box">${escapeHtml(b.customer)}</div><div><b>WhatsApp:</b> ${escapeHtml(b.phone)}</div>
+ <table><tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr>
+ ${b.items.map(x=>`<tr><td>${escapeHtml(x.desc)}</td><td>${x.q}</td><td class="r">${money(x.rate)}</td><td class="r">${money(x.amount)}</td></tr>`).join("")}
+ </table><div style="margin-top:18px;margin-left:auto;width:300px">
+ <div class="r">Subtotal: ${money(b.sub)}</div><div class="r">Discount: ${money(b.dis)}</div><div class="r grand">Grand Total: ${money(b.total)}</div></div>
+ <p style="margin-top:50px">Thank you for your business.</p></body></html>`;
+}
+async function saveBill(){
+ const b=getBill();
+ if(!b.items.length){alert("Please add at least one item.");return}
+ const html=pdfHtml(b);
+ const w=window.open("","_blank");w.document.write(html);w.document.close();
+ setTimeout(async()=>{
+  w.print();
+  saveRecord(b);
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="Bills - "+b.invoice+" - "+safeName(b.customer)+".html";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+ },400);
+}
+function safeName(s){return s.replace(/[^a-z0-9 _-]/gi,"").trim().slice(0,40)||"Customer"}
+function saveRecord(b){
+ let i=bills.findIndex(x=>x.invoice===b.invoice);if(i>=0)bills[i]=b;else bills.unshift(b);
+ localStorage.setItem("azeemBills",JSON.stringify(bills));renderHistory();
+}
+function renderHistory(){
+ const tb=document.querySelector("#historyTable tbody");tb.innerHTML="";
+ bills.forEach(b=>{let tr=document.createElement("tr");tr.innerHTML=`<td>${b.invoice}</td><td>${b.date}</td><td>${escapeHtml((b.customer||"").split("\\n")[0])}</td><td>${money(b.total)}</td><td>${b.status}</td><td><button class="secondary" onclick="loadBill('${b.invoice}')">Open</button></td>`;tb.appendChild(tr)})
+}
+function loadBill(no){
+ const b=bills.find(x=>x.invoice===no);if(!b)return;
+ invoiceNo.value=b.invoice;billDate.value=b.date;companyInfo.value=b.company;customerName.value=b.customer;whatsapp.value=b.phone;paymentStatus.value=b.status;
+ document.querySelector("#itemsTable tbody").innerHTML="";b.items.forEach(x=>addItem(x.desc,x.q,x.rate));discount.value=b.dis;calculate();
+}
+async function sendWhatsApp(){
+ const b=getBill();
+ if(!b.phone.trim()){alert("Enter the customer's WhatsApp number first.");return}
+ saveRecord(b);
+ const text=`AL AZEEM ENGINEERING WORKS\nBill No: ${b.invoice}\nDate: ${b.date}\nGrand Total: ${money(b.total)}\nStatus: ${b.status}\n\nPlease find your bill attached.`;
+ try{
+  if(navigator.share){
+   const blob=new Blob([pdfHtml(b)],{type:"text/html"});
+   const file=new File([blob],`${b.invoice}.html`,{type:"text/html"});
+   if(!navigator.canShare || navigator.canShare({files:[file]})){
+    await navigator.share({text:text,files:[file]});
+    return;
+   }
+  }
+ }catch(e){}
+ window.open("https://wa.me/"+b.phone.replace(/\D/g,"")+"?text="+encodeURIComponent(text),"_blank");
+ alert("WhatsApp opened. This browser does not support direct PDF attachment sharing; attach the bill from your Bills folder.");
+}
+function printBill(){
+ const b=getBill();const w=window.open("","_blank");w.document.write(pdfHtml(b));w.document.close();setTimeout(()=>w.print(),300);
+}
+function newBill(){
+ invoiceNo.value=nextInvoice();billDate.value=new Date().toISOString().slice(0,10);customerName.value="";whatsapp.value="";paymentStatus.value="Unpaid";discount.value=0;document.querySelector("#itemsTable tbody").innerHTML="";addItem();
+}
+function clearHistory(){if(confirm("Delete all saved bill history from this browser?")){bills=[];localStorage.removeItem("azeemBills");renderHistory()}}
+init();
+</script>
+</body>
+</html>
